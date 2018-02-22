@@ -182,11 +182,13 @@ function sizeMe(config = defaultConfig) {
         width: undefined,
         height: undefined,
         position: undefined,
+        didMount: false
       }
 
       componentDidMount() {
         this.determineStrategy(this.props)
-        this.handleDOMNode()
+        this.handleDOMNode();
+        this.setState({didMount: true})
       }
 
       componentWillReceiveProps(nextProps) {
@@ -257,10 +259,13 @@ function sizeMe(config = defaultConfig) {
         }
 
         this.domEl = found
-        resizeDetector(resizeDetectorStrategy).listenTo(
-          this.domEl,
-          this.checkIfSizeChanged,
-        )
+        if (this.state.didMount)
+        {
+          resizeDetector(resizeDetectorStrategy).listenTo(
+            this.domEl,
+            this.checkIfSizeChanged,
+          )
+        }
       }
 
       refCallback = element => {
