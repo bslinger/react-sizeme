@@ -234,7 +234,8 @@ function sizeMe() {
         return _ret = (_temp = (_this2 = _possibleConstructorReturn(this, (_ref2 = SizeAwareComponent.__proto__ || Object.getPrototypeOf(SizeAwareComponent)).call.apply(_ref2, [this].concat(args))), _this2), _this2.state = {
           width: undefined,
           height: undefined,
-          position: undefined
+          position: undefined,
+          didMount: false
         }, _this2.determineStrategy = function (props) {
           if (props.onSize) {
             if (!_this2.callbackState) {
@@ -288,6 +289,7 @@ function sizeMe() {
         value: function componentDidMount() {
           this.determineStrategy(this.props);
           this.handleDOMNode();
+          this.setState({ didMount: true });
         }
       }, {
         key: 'componentWillReceiveProps',
@@ -338,7 +340,9 @@ function sizeMe() {
           }
 
           this.domEl = found;
-          (0, _resizeDetector2.default)(resizeDetectorStrategy).listenTo(this.domEl, this.checkIfSizeChanged);
+          if (this.state.didMount) {
+            (0, _resizeDetector2.default)(resizeDetectorStrategy).listenTo(this.domEl, this.checkIfSizeChanged);
+          }
         }
       }, {
         key: 'render',

@@ -7,7 +7,7 @@
 		exports["ReactSizeMe"] = factory(require("react"), require("prop-types"), require("react-dom"));
 	else
 		root["ReactSizeMe"] = factory(root["React"], root["PropTypes"], root["ReactDOM"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_8__, __WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_10__) {
+})(typeof self !== 'undefined' ? self : this, function(__WEBPACK_EXTERNAL_MODULE_8__, __WEBPACK_EXTERNAL_MODULE_9__, __WEBPACK_EXTERNAL_MODULE_10__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -224,9 +224,11 @@ function debounce(func, wait, options) {
   function remainingWait(time) {
     var timeSinceLastCall = time - lastCallTime,
         timeSinceLastInvoke = time - lastInvokeTime,
-        result = wait - timeSinceLastCall;
+        timeWaiting = wait - timeSinceLastCall;
 
-    return maxing ? nativeMin(result, maxWait - timeSinceLastInvoke) : result;
+    return maxing
+      ? nativeMin(timeWaiting, maxWait - timeSinceLastInvoke)
+      : timeWaiting;
   }
 
   function shouldInvoke(time) {
@@ -668,7 +670,8 @@ function sizeMe() {
         return _ret = (_temp = (_this2 = _possibleConstructorReturn(this, (_ref2 = SizeAwareComponent.__proto__ || Object.getPrototypeOf(SizeAwareComponent)).call.apply(_ref2, [this].concat(args))), _this2), _this2.state = {
           width: undefined,
           height: undefined,
-          position: undefined
+          position: undefined,
+          didMount: false
         }, _this2.determineStrategy = function (props) {
           if (props.onSize) {
             if (!_this2.callbackState) {
@@ -722,6 +725,7 @@ function sizeMe() {
         value: function componentDidMount() {
           this.determineStrategy(this.props);
           this.handleDOMNode();
+          this.setState({ didMount: true });
         }
       }, {
         key: 'componentWillReceiveProps',
@@ -772,7 +776,9 @@ function sizeMe() {
           }
 
           this.domEl = found;
-          (0, _resizeDetector2.default)(resizeDetectorStrategy).listenTo(this.domEl, this.checkIfSizeChanged);
+          if (this.state.didMount) {
+            (0, _resizeDetector2.default)(resizeDetectorStrategy).listenTo(this.domEl, this.checkIfSizeChanged);
+          }
         }
       }, {
         key: 'render',
@@ -848,12 +854,10 @@ module.exports = __WEBPACK_EXTERNAL_MODULE_10__;
 
 "use strict";
 /**
- * Copyright 2013-2015, Facebook, Inc.
- * All rights reserved.
+ * Copyright (c) 2013-present, Facebook, Inc.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  */
 
 
@@ -2886,7 +2890,7 @@ module.exports = function(options) {
                 var width = element.offsetWidth;
                 var height = element.offsetHeight;
 
-                if (width !== element.lastWidth || height !== element.lastHeight) {
+                if (width !== getState(element).lastWidth || height !== getState(element).lastHeight) {
                     debug("Element size changed.");
                     updateDetectorElements(notifyListenersIfNeeded);
                 } else {
